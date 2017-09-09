@@ -171,23 +171,18 @@ var CAA = recordBuilder('CAA', {
 var TLSA = recordBuilder('TLSA', {
     args: [
         ['name' _.isString],
-        ['usage', _.isString],
-        ['selector', _.isString],
-        ['tlsatype', _.isString],
+        ['usage', _.isNumber],
+        ['selector', _.isNumber],
+        ['tlsatype', _.isNumber],
         ['cert', _.isString],
     ],
     transform: function(record, args, modifiers){
         record.name = args.name;
-        record.usage = args.foo;
+        record.usage = args.usage;
         record.selector = args.selector;
         record.tlsatype = args.tlsatype;
         record.cert = args.cert;
     },
-    /*
-    modifierNumber: function(record, value){
-        record.fooflags |= value;
-    },
-    */
 });
 
 // CNAME(name,target, recordModifiers...)
