@@ -128,7 +128,6 @@ function makeCAAFlag(value){
 var CAA_CRITICAL = makeCAAFlag(1<<0);
 
 
-
 // DnsProvider("providerName", 0) 
 // nsCount of 0 means don't use or register any nameservers.
 // nsCount not provider means use all.
@@ -168,6 +167,29 @@ var CAA = recordBuilder('CAA', {
     },
 });
 
+// name, usage, selector, tlsatype, cert
+var TLSA = recordBuilder('TLSA', {
+    args: [
+        ['name' _.isString],
+        ['usage', _.isString],
+        ['selector', _.isString],
+        ['tlsatype', _.isString],
+        ['cert', _.isString],
+    ],
+    transform: function(record, args, modifiers){
+        record.name = args.name;
+        record.usage = args.foo;
+        record.selector = args.selector;
+        record.tlsatype = args.tlsatype;
+        record.cert = args.cert;
+    },
+    /*
+    modifierNumber: function(record, value){
+        record.fooflags |= value;
+    },
+    */
+});
+
 // CNAME(name,target, recordModifiers...)
 var CNAME = recordBuilder('CNAME');
 
@@ -191,15 +213,6 @@ var SRV = recordBuilder('SRV', {
         record.target = args.target;
     },
 });
-
-// TLSA(name,usage,selector,type,certificate,, recordModifiers...)
-function TLSA(name, usage, selector, tlsatype, cert) {
-    checkArgs([_.isString, _.isNumber, _.isNumber, _.isNumber, _.isString], arguments, "TLSA expects (name, usage, selector, type, certificate)")
-    var mods = getModifiers(arguments,5)
-    return function(d) {
-        addRecordTLSA(d, "TLSA", name, usage, selector, tlsatype, cert, mods)
-    }
-}
 
 // TXT(name,target, recordModifiers...)
 var TXT = recordBuilder('TXT');
@@ -414,68 +427,6 @@ function addRecord(d,type,name,target,mods) {
     // - Function: call is with the record as the argument
     // - Object: merge it into the metadata
     // - Number: IF MX record assume it is priority
-    if (mods) {
-        for (var i = 0; i< mods.length; i++) {
-            var m = mods[i]
-            if (_.isFunction(m)) {
-                m(rec);
-            } else if (_.isObject(m) && m.caatag) {
-                // caatag is a top level object, not in meta
-                rec.caatag = m.caatag;
-            } else if (_.isObject(m)) {
-                 //convert transforms to strings
-                 if (m.transform && _.isArray(m.transform)){
-                    m.transform = format_tt(m.transform)
-                 }
-                _.extend(rec.meta,m);
-                _.extend(rec.meta,m);
-            } else if (_.isNumber(m) && type == "MX") {
-               rec.mxpreference = m;
-            } else if (_.isNumber(m) && type == "CAA") {
-               rec.caaflags |= m;
-            } else {
-                console.log("WARNING: Modifier type unsupported:", typeof m, "(Skipping!)");
-            }
-        }
-    }
-    d.records.push(rec);
-    return rec;
-}
-
-function addRecordSRV(d,type,name,srvpriority,srvweight,srvport,target,mods) {
-    var rec = {type: type, name: name, srvpriority: srvpriority, srvweight: srvweight, srvport: srvport, target: target, ttl:d.defaultTTL, meta:{}};
-
-    // for each modifier, decide based on type:
-    // - Function: call is with the record as the argument
-    // - Object: merge it into the metadata
-    // FIXME(tlim): Factor this code out to its own function.
-    if (mods) {
-        for (var i = 0; i< mods.length; i++) {
-            var m = mods[i]
-            if (_.isFunction(m)) {
-                m(rec);
-            } else if (_.isObject(m)) {
-                 //convert transforms to strings
-                 if (m.transform && _.isArray(m.transform)){
-                    m.transform = format_tt(m.transform)
-                 }
-                _.extend(rec.meta,m);
-                _.extend(rec.meta,m);
-            } else {
-                console.log("WARNING: Modifier type unsupported:", typeof m, "(Skipping!)");
-            }
-        }
-    }
-    d.records.push(rec);
-    return rec;
-}
-
-function addRecordTLSA(d,type,name,usage,selector,tlsatype,cert,mods) {
-    var rec = {type: type, name: name, tlsausage: usage, tlsaselector: selector, tlsatype: tlsatype, tlsacert: cert, ttl:d.defaultTTL, meta:{}};
-    // for each modifier, decide based on type:
-    // - Function: call is with the record as the argument
-    // - Object: merge it into the metadata
-    // FIXME(tlim): Factor this code out to its own function.
     if (mods) {
         for (var i = 0; i< mods.length; i++) {
             var m = mods[i]
