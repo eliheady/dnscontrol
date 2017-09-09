@@ -99,7 +99,8 @@ func checkLabel(label string, rType string, domain string) error {
 	}
 
 	//underscores are warnings
-	if rType != ("SRV" || "TLSA") && strings.ContainsRune(label, '_') {
+	if rType != "SRV" && rType != "TLSA" && strings.ContainsRune(label, '_') {
+	//if rType != "SRV" && strings.ContainsRune(label, '_') {
 		//unless it is in our exclusion list
 		ok := false
 		for _, ex := range expectedUnderscores {
@@ -292,6 +293,7 @@ func NormalizeAndValidateConfig(config *models.DNSConfig) (errs []error) {
 				if rec.CaaTag != "issue" && rec.CaaTag != "issuewild" && rec.CaaTag != "iodef" {
 					errs = append(errs, fmt.Errorf("CAA tag %s is invalid", rec.CaaTag))
 				}
+			}
 			// Populate FQDN:
 			rec.NameFQDN = dnsutil.AddOrigin(rec.Name, domain.Name)
 		}
