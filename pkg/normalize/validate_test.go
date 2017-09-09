@@ -191,3 +191,21 @@ func TestCAAValidation(t *testing.T) {
 		t.Error("Expect error on invalid CAA but got none")
 	}
 }
+
+func TestTLSAValidation(t *testing.T) {
+	config := &models.DNSConfig{
+		Domains: []*models.DomainConfig{
+			{
+				Name:      "_443._tcp.example.com",
+				Registrar: "BIND",
+				Records: []*models.RecordConfig{
+					{Name: "_443._tcp", Type: "TLSA", TlsaUsage: 3, TlsaSelector: 1, TlsaType: 1, TlsaCert: "abcdef0"},
+				},
+			},
+		},
+	}
+	errs := NormalizeAndValidateConfig(config)
+	if len(errs) != 1 {
+		t.Error("Expect error on invalid TLSA but got none")
+	}
+}

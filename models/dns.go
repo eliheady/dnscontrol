@@ -73,6 +73,10 @@ type RecordConfig struct {
 	SrvPort      uint16            `json:"srvport,omitempty"`
 	CaaTag       string            `json:"caatag,omitempty"`
 	CaaFlag      uint8             `json:"caaflag,omitempty"`
+	TlsaUsage    uint8             `json:"tlsausage,omitempty"`
+	TlsaSelector uint8             `json:"tlsaselector,omitempty"`
+	TlsaType     uint8             `json:"tlsatype,omitempty"`
+	TlsaCert     string            `json:"tlsacert,omitempty"`
 
 	CombinedTarget bool `json:"-"`
 
@@ -147,6 +151,10 @@ func (r *RecordConfig) MergeToTarget() {
 	r.SrvPort = 0
 	r.CaaFlag = 0
 	r.CaaTag = ""
+	r.TlsaUsage = 0
+	r.TlsaType = 0
+	r.TlsaSelector = 0
+	r.TlsaCert = ""
 
 	r.CombinedTarget = true
 }
@@ -206,6 +214,11 @@ func (rc *RecordConfig) ToRR() dns.RR {
 		rr.(*dns.CAA).Flag = rc.CaaFlag
 		rr.(*dns.CAA).Tag = rc.CaaTag
 		rr.(*dns.CAA).Value = rc.Target
+	case dns.TypeTLSA:
+		rr.(*dns.TLSA).Usage = rc.TlsaUsage
+		rr.(*dns.TLSA).MatchingType = rc.TlsaType
+		rr.(*dns.TLSA).Selector = rc.TlsaSelector
+		rr.(*dns.TLSA).Certificate = rc.TlsaCert
 	case dns.TypeTXT:
 		rr.(*dns.TXT).Txt = []string{rc.Target}
 	default:

@@ -54,6 +54,8 @@ const (
 	// so it is easier to simply mark this feature as not working for this
 	// provider.
 	CantUseNOPURGE
+	// CanUseTLSA indicates the provider can handle TLSA records
+	CanUseTLSA
 )
 
 func ProviderHasCabability(pType string, cap Capability) bool {
