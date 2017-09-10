@@ -75,8 +75,8 @@ type RecordConfig struct {
 	CaaFlag      uint8             `json:"caaflag,omitempty"`
 	TlsaUsage    uint8             `json:"tlsausage,omitempty"`
 	TlsaSelector uint8             `json:"tlsaselector,omitempty"`
-	TlsaType     uint8             `json:"tlsatype,omitempty"`
-	TlsaCert     string            `json:"tlsacert,omitempty"`
+	TlsaMatchingType uint8         `json:"tlsamatchingtype,omitempty"`
+	TlsaCertificate  string        `json:"tlsacertificate,omitempty"`
 
 	CombinedTarget bool `json:"-"`
 
@@ -152,9 +152,9 @@ func (r *RecordConfig) MergeToTarget() {
 	r.CaaFlag = 0
 	r.CaaTag = ""
 	r.TlsaUsage = 0
-	r.TlsaType = 0
+	r.TlsaMatchingType = 0
 	r.TlsaSelector = 0
-	r.TlsaCert = ""
+	r.TlsaCertificate = ""
 
 	r.CombinedTarget = true
 }
@@ -216,9 +216,9 @@ func (rc *RecordConfig) ToRR() dns.RR {
 		rr.(*dns.CAA).Value = rc.Target
 	case dns.TypeTLSA:
 		rr.(*dns.TLSA).Usage = rc.TlsaUsage
-		rr.(*dns.TLSA).MatchingType = rc.TlsaType
+		rr.(*dns.TLSA).MatchingType = rc.TlsaMatchingType
 		rr.(*dns.TLSA).Selector = rc.TlsaSelector
-		rr.(*dns.TLSA).Certificate = rc.TlsaCert
+		rr.(*dns.TLSA).Certificate = rc.TlsaCertificate
 	case dns.TypeTXT:
 		rr.(*dns.TXT).Txt = []string{rc.Target}
 	default:
@@ -295,7 +295,7 @@ func (dc *DomainConfig) Punycode() error {
 			if err != nil {
 				return err
 			}
-		case "A", "AAAA", "CAA", "TXT":
+		case "A", "AAAA", "CAA", "TXT", "TLSA":
 			// Nothing to do.
 		default:
 			msg := fmt.Sprintf("Punycode rtype %v unimplemented", rec.Type)

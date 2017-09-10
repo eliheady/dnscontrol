@@ -99,7 +99,7 @@ func checkLabel(label string, rType string, domain string) error {
 	}
 
 	//underscores are warnings
-	if rType != "SRV" && rType != "TLSA" && strings.ContainsRune(label, '_') {
+	if rType != "SRV" && strings.ContainsRune(label, '_') {
 	//if rType != "SRV" && strings.ContainsRune(label, '_') {
 		//unless it is in our exclusion list
 		ok := false

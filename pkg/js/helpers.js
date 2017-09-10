@@ -167,24 +167,6 @@ var CAA = recordBuilder('CAA', {
     },
 });
 
-// name, usage, selector, tlsatype, cert
-var TLSA = recordBuilder('TLSA', {
-    args: [
-        ['name' _.isString],
-        ['usage', _.isNumber],
-        ['selector', _.isNumber],
-        ['tlsatype', _.isNumber],
-        ['cert', _.isString],
-    ],
-    transform: function(record, args, modifiers){
-        record.name = args.name;
-        record.usage = args.usage;
-        record.selector = args.selector;
-        record.tlsatype = args.tlsatype;
-        record.cert = args.cert;
-    },
-});
-
 // CNAME(name,target, recordModifiers...)
 var CNAME = recordBuilder('CNAME');
 
@@ -206,6 +188,24 @@ var SRV = recordBuilder('SRV', {
         record.srvweight = args.weight;
         record.srvport = args.port;
         record.target = args.target;
+    },
+});
+
+// name, usage, selector, tlsatype, certificate
+var TLSA = recordBuilder('TLSA', {
+    args: [
+        ['name' _.isString],
+        ['usage', _.isNumber],
+        ['selector', _.isNumber],
+        ['matchingtype', _.isNumber],
+        ['certificate', _.isString],
+    ],
+    transform: function(record, args, modifiers){
+        record.name = args.name;
+        record.tlsausage = args.usage;
+        record.tlsaselector = args.selector;
+        record.tlsamatchingtype = args.matchingtype;
+        record.tlsacertificate = args.certificate;
     },
 });
 
