@@ -293,7 +293,16 @@ func NormalizeAndValidateConfig(config *models.DNSConfig) (errs []error) {
 				if rec.CaaTag != "issue" && rec.CaaTag != "issuewild" && rec.CaaTag != "iodef" {
 					errs = append(errs, fmt.Errorf("CAA tag %s is invalid", rec.CaaTag))
 				}
+			//	TODO: test for valid ranges of ints for relevant fields (RFC 6698)
+			//	usage: 0-3
+			//	selector: 0,1
+			//	type: 0-2
+			//	} else if rec.Type == "TLSA" {
+			//	if rec.TlsaUsage != 3 || rec.TlsaSelector != 1 || rec.TlsaMatchingType != 1 {
+			//		errs = append(errs, fmt.Errorf("TLSA record is invalid"))
+			//	}
 			}
+
 			// Populate FQDN:
 			rec.NameFQDN = dnsutil.AddOrigin(rec.Name, domain.Name)
 		}
