@@ -99,18 +99,22 @@ func checkLabel(label string, rType string, domain string) error {
 	}
 
 	//underscores are warnings
-	if rType != "SRV" && strings.ContainsRune(label, '_') {
-	//if rType != "SRV" && strings.ContainsRune(label, '_') {
-		//unless it is in our exclusion list
-		ok := false
-		for _, ex := range expectedUnderscores {
-			if strings.Contains(label, ex) {
-				ok = true
-				break
+	if strings.ContainsRune(label, '_') {
+		switch rType {
+		// Record types that are expected to have underscore labels
+	case "SRV", "TLSA", "TXT":
+		default:
+			//unless it is in our exclusion list
+			ok := false
+			for _, ex := range expectedUnderscores {
+				if strings.Contains(label, ex) {
+					ok = true
+					break
+				}
 			}
-		}
-		if !ok {
-			return Warning{fmt.Errorf("label %s.%s contains an underscore", label, domain)}
+			if !ok {
+				return Warning{fmt.Errorf("label %s.%s contains an underscore", label, domain)}
+			}
 		}
 	}
 	return nil
