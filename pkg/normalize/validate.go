@@ -102,7 +102,7 @@ func checkLabel(label string, rType string, domain string) error {
 	if strings.ContainsRune(label, '_') {
 		switch rType {
 		// Record types that are expected to have underscore labels
-	case "SRV", "TLSA", "TXT":
+		case "SRV", "TLSA", "TXT":
 		default:
 			//unless it is in our exclusion list
 			ok := false
