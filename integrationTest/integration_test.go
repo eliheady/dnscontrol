@@ -367,9 +367,12 @@ var tests = []*TestCase{
 	tc("CAA delete", caa("@", "issue", 0, "letsencrypt.org")).IfHasCapability(providers.CanUseCAA),
 
 	//TLSA
-	//FIXME: add change fields tests
 	tc("Empty").IfHasCapability(providers.CanUseTLSA),
-	tc("TLSA change usage", tlsa("_443._tcp", 3, 1, 1, "abcdef0123456789==")).IfHasCapability(providers.CanUseTLSA),
+	tc("TLSA record", tlsa("_443._tcp", 3, 1, 1, "abcdef0123456789==")).IfHasCapability(providers.CanUseTLSA),
+	tc("TLSA change usage", tlsa("_443._tcp", 2, 1, 1, "abcdef0123456789==")).IfHasCapability(providers.CanUseTLSA),
+	tc("TLSA change selector", tlsa("_443._tcp", 2, 0, 1, "abcdef0123456789==")).IfHasCapability(providers.CanUseTLSA),
+	tc("TLSA change matchingtype", tlsa("_443._tcp", 2, 0, 0, "abcdef0123456789==")).IfHasCapability(providers.CanUseTLSA),
+	tc("TLSA change certificate", tlsa("_443._tcp", 2, 0, 0, "0123456789abcdef==")).IfHasCapability(providers.CanUseTLSA),
 
 	// Test large zonefiles.
 	// Gandi pages 100 items at a time.
