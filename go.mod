@@ -53,9 +53,9 @@ require (
 	github.com/urfave/cli/v2 v2.11.2
 	github.com/vultr/govultr v1.1.1
 	github.com/xddxdd/ottoext v0.0.0-20210101073831-439879ee6281
-	golang.org/x/net v0.0.0-20220812174116-3211cb980234
-	golang.org/x/oauth2 v0.0.0-20220808172628-8227340efae7
-	google.golang.org/api v0.92.0
+	golang.org/x/net v0.0.0-20220909164309-bea034e7d591
+	golang.org/x/oauth2 v0.0.0-20220822191816-0ebed06d0094
+	google.golang.org/api v0.98.0
 	gopkg.in/ns1/ns1-go.v2 v2.6.5
 	gopkg.in/yaml.v2 v2.4.0
 )
