@@ -48,7 +48,7 @@ var features = providers.DocumentationNotes{
 	providers.CanAutoDNSSEC:          providers.Unimplemented("Supported by INWX but not implemented yet."),
 	providers.CanGetZones:            providers.Can(),
 	providers.CanConcur:              providers.Cannot(),
-	providers.CanUseAlias:            providers.Cannot("INWX does not support the ALIAS or ANAME record type."),
+	providers.CanUseAlias:            providers.Can(),
 	providers.CanUseCAA:              providers.Can(),
 	providers.CanUseDS:               providers.Unimplemented("DS records are only supported at the apex and require a different API call that hasn't been implemented yet."),
 	providers.CanUseHTTPS:            providers.Can(),
@@ -186,7 +186,7 @@ func makeNameserverRecordRequest(domain string, rec *models.RecordConfig) *goinw
 	   Records with empty targets (i.e. records with target ".")
 	   are allowed.
 	*/
-	case "CNAME", "NS":
+	case "CNAME", "NS", "ALIAS":
 		req.Content = content[:len(content)-1]
 	case "MX":
 		req.Priority = int(rec.MxPreference)
@@ -313,6 +313,7 @@ func (api *inwxAPI) GetZoneRecords(domain string, meta map[string]string) (model
 			"NS":    true,
 			"SRV":   true,
 			"PTR":   true,
+			"ALIAS": true,
 		}
 		if rtypeAddDot[record.Type] {
 			if record.Type == "MX" && record.Content == "." {
