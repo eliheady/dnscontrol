@@ -168,11 +168,13 @@ See [dnscontrol-action](https://github.com/koenrh/dnscontrol-action) or [gacts/i
 - **NAMEDOTCOM and SOFTLAYER need maintainers!** These providers have no maintainer. Maintainers respond to PRs and fix bugs in a timely manner, and try to stay on top of protocol changes.
 - **get-certs/ACME support is frozen and will be removed without notice between now and July 2025.** It has been unsupported since December 2022.  If you don't use this feature, do not start. If you do use this feature, migrate ASAP.  See discussion in [issues/1400](https://github.com/StackExchange/dnscontrol/issues/1400)
 
-## More info at our website
+## More info
 
 The website: [https://docs.dnscontrol.org/](https://docs.dnscontrol.org/)
 
 The getting started guide: [https://docs.dnscontrol.org/getting-started/getting-started](https://docs.dnscontrol.org/getting-started/getting-started)
+
+The mailing list: [https://groups.google.com/g/dnscontrol-discuss](https://groups.google.com/g/dnscontrol-discuss)
 
 ## Stargazers over time
 
