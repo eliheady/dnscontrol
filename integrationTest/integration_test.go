@@ -342,8 +342,8 @@ func makeTests() []*TestGroup {
 			tc("unnull", // Change to regular MX.
 				a("nmx", "1.2.3.3"),
 				a("www", "1.2.3.9"),
-				mx("nmx", 3, "nmx.**current-domain**."),
-				mx("nmx", 9, "www.**current-domain**."),
+				mx("nmx", 13, "nmx-other.**current-domain**."),
+				mx("nmx", 19, "www.**current-domain**."),
 			),
 			tc("renull", // Change back to Null MX.
 				a("nmx", "1.2.3.3"),
@@ -365,8 +365,8 @@ func makeTests() []*TestGroup {
 			tc("unnull", // Change to regular MX.
 				a("@", "1.2.3.2"),
 				a("www", "1.2.3.8"),
-				mx("@", 2, "**current-domain**."),
-				mx("@", 8, "www.**current-domain**."),
+				mx("@", 12, "mx.**current-domain**."),
+				mx("@", 18, "www.**current-domain**."),
 			),
 			tc("renull", // Change back to Null MX.
 				a("@", "1.2.3.2"),
