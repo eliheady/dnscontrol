@@ -17,5 +17,9 @@ func AuditRecords(records []*models.RecordConfig) []error {
 
 	a.Add("TXT", rejectif.TxtIsEmpty) // Last verified 2021-03-01
 
+	a.Add("TXT", rejectif.TxtHasBackslash) // Last verified 2025-04-03
+
+	a.Add("TXT", rejectif.TxtHasDoubleQuotes) // Last verified 2025-04-03
+
 	return a.Audit(records)
 }
