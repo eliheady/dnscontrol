@@ -345,13 +345,11 @@ func makeTests() []*TestGroup {
 				mx("nmx", 13, "nmx-other.**current-domain**."),
 				mx("nmx", 19, "www.**current-domain**."),
 			),
-			/*
-				tc("renull", // Change back to Null MX.
-					a("nmx", "1.2.3.3"),
-					a("www", "1.2.3.9"),
-					mx("nmx", 0, "."),
-				),
-			*/
+			tc("renull", // Change back to Null MX.
+				a("nmx", "1.2.3.3"),
+				a("www", "1.2.3.9"),
+				mx("nmx", 0, "."),
+			),
 		),
 
 		// RFC 7505 NullMX at Apex
@@ -370,13 +368,11 @@ func makeTests() []*TestGroup {
 				mx("@", 12, "mx.**current-domain**."),
 				mx("@", 18, "www.**current-domain**."),
 			),
-			/*
-				tc("renull", // Change back to Null MX.
-					a("@", "1.2.3.2"),
-					a("www", "1.2.3.8"),
-					mx("@", 0, "."),
-				),
-			*/
+			tc("renull", // Change back to Null MX.
+				a("@", "1.2.3.2"),
+				a("www", "1.2.3.8"),
+				mx("@", 0, "."),
+			),
 		),
 
 		testgroup("NS",
