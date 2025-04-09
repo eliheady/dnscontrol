@@ -245,13 +245,33 @@ func (api *inwxAPI) GetZoneRecordsCorrections(dc *models.DomainConfig, foundReco
 		case diff2.REPORT:
 			corrections = append(corrections, &models.Correction{Msg: changeMsgs})
 		case diff2.CHANGE:
-			recID := change.Old[0].Original.(goinwx.NameserverRecord).ID
-			corrections = append(corrections, &models.Correction{
-				Msg: changeMsgs,
-				F: func() error {
-					return api.updateRecord(recID, change.New[0])
-				},
-			})
+			if change.Old[0].Type == "MX" {
+				if change.Old[0].GetTargetField() == "." || change.New[0].GetTargetField() == "." {
+					// There is a Null MX in this change. Delete then create instead of update:
+					// INWX enforces RFC 7505 mandate that Null MX records and non-null MX records
+					// cannot coexist. So we need to delete the old record and create a new one.
+					// INWX also does not allow to update the preference (priority) of MX records to 0
+					recID := change.Old[0].Original.(goinwx.NameserverRecord).ID
+					corrections = append(corrections, &models.Correction{
+						Msg: fmt.Sprintf("(delete) %s", changeMsgs),
+						F:   func() error { return api.deleteRecord(recID) },
+					})
+					corrections = append(corrections, &models.Correction{
+						Msg: fmt.Sprintf("(create) %s", changeMsgs),
+						F: func() error {
+							return api.createRecord(dcName, change.New[0])
+						},
+					})
+				}
+			} else {
+				recID := change.Old[0].Original.(goinwx.NameserverRecord).ID
+				corrections = append(corrections, &models.Correction{
+					Msg: changeMsgs,
+					F: func() error {
+						return api.updateRecord(recID, change.New[0])
+					},
+				})
+			}
 		case diff2.CREATE:
 			changeNew := change.New[0]
 			corrections = append(corrections, &models.Correction{
