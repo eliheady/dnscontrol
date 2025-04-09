@@ -342,8 +342,8 @@ func makeTests() []*TestGroup {
 			tc("unnull", // Change to regular MX.
 				a("nmx", "1.2.3.3"),
 				a("www", "1.2.3.9"),
-				mx("nmx", 13, "nmx-other.**current-domain**."),
-				mx("nmx", 19, "www.**current-domain**."),
+				mx("nmx", 3, "nmx.**current-domain**."),
+				mx("nmx", 9, "www.**current-domain**."),
 			),
 			tc("renull", // Change back to Null MX.
 				a("nmx", "1.2.3.3"),
@@ -365,8 +365,8 @@ func makeTests() []*TestGroup {
 			tc("unnull", // Change to regular MX.
 				a("@", "1.2.3.2"),
 				a("www", "1.2.3.8"),
-				mx("@", 12, "mx.**current-domain**."),
-				mx("@", 18, "www.**current-domain**."),
+				mx("@", 2, "**current-domain**."),
+				mx("@", 8, "www.**current-domain**."),
 			),
 			tc("renull", // Change back to Null MX.
 				a("@", "1.2.3.2"),
@@ -600,6 +600,7 @@ func makeTests() []*TestGroup {
 				"GANDI_V5",   // Their API is so damn slow. We'll add it back as needed.
 				"HEDNS",      // Doesn't page. Works fine.  Due to the slow API we skip.
 				"HEXONET",    // Doesn't page. Works fine.  Due to the slow API we skip.
+				"INWX",       // Test frequently triggers API errors.
 				"LOOPIA",     // Their API is so damn slow. Plus, no paging.
 				"MSDNS",      // No paging done. No need to test.
 				"NAMEDOTCOM", // Their API is so damn slow. We'll add it back as needed.
