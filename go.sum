@@ -332,10 +332,10 @@ github.com/montanaflynn/stats v0.0.0-20171201202039-1bf9dbcd8cbe/go.mod h1:wL8QJ
 github.com/namedotcom/go v0.0.0-20180403034216-08470befbe04 h1:o6uBwrhM5C8Ll3MAAxrQxRHEu7FkapwTuI2WmL1rw4g=
 github.com/namedotcom/go v0.0.0-20180403034216-08470befbe04/go.mod h1:5sN+Lt1CaY4wsPvgQH/jsuJi4XO2ssZbdsIizr4CVC8=
 github.com/nbio/st v0.0.0-20140626010706-e9e8d9816f32/go.mod h1:9wM+0iRr9ahx58uYLpLIr5fm8diHn0JbqRycJi6w0Ms=
-github.com/nrdcg/goinwx v0.10.1-0.20250416033246-94fd00064ce5 h1:qDzYZt+p9IrjeEraAJZSSroMfAq7lsKWX92Ea4EhGM4=
-github.com/nrdcg/goinwx v0.10.1-0.20250416033246-94fd00064ce5/go.mod h1:0BXSC0FxVtU4aTjX0Zw3x0DK32tjugLzeNIAGtwXvPQ=
 github.com/nrdcg/goinwx v0.10.1-0.20250416141944-db625b93bde2 h1:URhG8aJft1ZRRXcqfOLGhakqF1DhbfMLEhUy/V+OpUY=
 github.com/nrdcg/goinwx v0.10.1-0.20250416141944-db625b93bde2/go.mod h1:0BXSC0FxVtU4aTjX0Zw3x0DK32tjugLzeNIAGtwXvPQ=
+github.com/nrdcg/goinwx v0.11.0 h1:GER0SE3POub7rxARt3Y3jRy1OON1hwF1LRxHz5xsFBw=
+github.com/nrdcg/goinwx v0.11.0/go.mod h1:0BXSC0FxVtU4aTjX0Zw3x0DK32tjugLzeNIAGtwXvPQ=
 github.com/onsi/ginkgo/v2 v2.15.0 h1:79HwNRBAZHOEwrczrgSOPy+eFTTlIGELKy5as+ClttY=
 github.com/onsi/ginkgo/v2 v2.15.0/go.mod h1:HlxMHtYF57y6Dpf+mc5529KKmSq9h2FpCF+/ZkwUxKM=
 github.com/onsi/gomega v1.31.1 h1:KYppCUK+bUgAZwHOu7EXVBKyQA6ILvOESHkn/tgoqvo=
