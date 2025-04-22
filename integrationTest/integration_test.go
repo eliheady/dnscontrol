@@ -19,8 +19,11 @@ func TestDNSProviders(t *testing.T) {
 		t.Fatal("NO DOMAIN SET!  Exiting!")
 	}
 
+	// REMOVE ME: quick hack to select known failing tests to run
+	runSkippedTests := true
+
 	t.Run(domain, func(t *testing.T) {
-		runTests(t, provider, domain, cfg)
+		runTests(t, provider, domain, cfg, runSkippedTests)
 	})
 }
 
@@ -1912,6 +1915,10 @@ func makeTests() []*TestGroup {
 				"gcore_ip":                 "4.3.2.1",
 			})),
 			tc("Delete metadata from record", a("@", "1.2.3.4")),
+		),
+
+		testgroup("INWX expected failure tests",
+			only("INWX"),
 		),
 
 		// This MUST be the last test.

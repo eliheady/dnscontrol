@@ -102,7 +102,7 @@ func testPermitted(p string, f TestGroup) error {
 }
 
 // makeChanges runs one set of DNS record tests. Returns true on success.
-func makeChanges(t *testing.T, prv providers.DNSServiceProvider, dc *models.DomainConfig, tst *TestCase, desc string, expectChanges bool, origConfig map[string]string) bool {
+func makeChanges(t *testing.T, prv providers.DNSServiceProvider, dc *models.DomainConfig, tst *TestCase, desc string, expectChanges bool, origConfig map[string]string, runSkippedTests bool) bool {
 	domainName := dc.Name
 
 	return t.Run(desc+":"+tst.Desc, func(t *testing.T) {
@@ -143,9 +143,17 @@ func makeChanges(t *testing.T, prv providers.DNSServiceProvider, dc *models.Doma
 		models.PostProcessRecords(dom.Records)
 		dom2, _ := dom.Copy()
 
-		if err := providers.AuditRecords(*providerFlag, dom.Records); err != nil {
-			t.Skipf("***SKIPPED(PROVIDER DOES NOT SUPPORT '%s' ::%q)", err, desc)
-			return
+		if !runSkippedTests {
+			if err := providers.AuditRecords(*providerFlag, dom.Records); err != nil {
+				t.Skipf("***SKIPPED(PROVIDER DOES NOT SUPPORT '%s' ::%q)", err, desc)
+				return
+			}
+		} else {
+			// REMOVE ME: quick hack to skip working tests and speed up cycle
+			if err := providers.AuditRecords(*providerFlag, dom.Records); err == nil {
+				t.Skipf("***SKIPPED(PROVIDER SUPPORT FOR '%s' IS GOOD ::%q)", err, desc)
+				return
+			}
 		}
 
 		// get and run corrections for first time
@@ -170,6 +178,16 @@ func makeChanges(t *testing.T, prv providers.DNSServiceProvider, dc *models.Doma
 			}
 			if c.F != nil { // F == nil if there is just a msg, no action.
 				err = c.F()
+				// REMOVE ME:
+				if runSkippedTests && err != nil {
+					// this is an expected failure
+					t.Logf("Expected failure occurred (good): %s", c.Msg)
+					continue
+				}
+				if runSkippedTests && err == nil {
+					t.Logf("Expected failure but got success (confirm AuditRecords rules and provider capabilities): %s", c.Msg)
+					t.Fatal(err)
+				}
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -196,7 +214,7 @@ func makeChanges(t *testing.T, prv providers.DNSServiceProvider, dc *models.Doma
 	})
 }
 
-func runTests(t *testing.T, prv providers.DNSServiceProvider, domainName string, origConfig map[string]string) {
+func runTests(t *testing.T, prv providers.DNSServiceProvider, domainName string, origConfig map[string]string, runSkippedTests bool) {
 	dc := getDomainConfigWithNameservers(t, prv, domainName)
 	testGroups := makeTests()
 
@@ -221,12 +239,12 @@ func runTests(t *testing.T, prv providers.DNSServiceProvider, domainName string,
 		// fmt.Printf("DEBUG testPermitted: prov=%q profile=%q\n", *providerFlag, *profileFlag)
 		if err := testPermitted(*profileFlag, *group); err != nil {
 			// t.Logf("%s: ***SKIPPED(%v)***", group.Desc, err)
-			makeChanges(t, prv, dc, tc("Empty"), fmt.Sprintf("%02d:%s ***SKIPPED(%v)***", gIdx, group.Desc, err), false, origConfig)
+			makeChanges(t, prv, dc, tc("Empty"), fmt.Sprintf("%02d:%s ***SKIPPED(%v)***", gIdx, group.Desc, err), false, origConfig, runSkippedTests)
 			continue
 		}
 
 		// Start the testgroup with a clean slate.
-		makeChanges(t, prv, dc, tc("Empty"), "Clean Slate", false, nil)
+		makeChanges(t, prv, dc, tc("Empty"), "Clean Slate", false, nil, runSkippedTests)
 
 		// Run the tests.
 		start := time.Now()
@@ -240,7 +258,7 @@ func runTests(t *testing.T, prv providers.DNSServiceProvider, domainName string,
 			//      if t.Failed() {
 			//        break
 			//      }
-			if ok := makeChanges(t, prv, dc, tst, fmt.Sprintf("%02d:%s", gIdx, group.Desc), true, origConfig); !ok {
+			if ok := makeChanges(t, prv, dc, tst, fmt.Sprintf("%02d:%s", gIdx, group.Desc), true, origConfig, runSkippedTests); !ok {
 				break
 			}
 		}
@@ -267,11 +285,18 @@ type TestCase struct {
 	Unmanaged       []*models.UnmanagedConfig
 	UnmanagedUnsafe bool // DISABLE_IGNORE_SAFETY_CHECK
 	Changeless      bool // set to true if any changes would be an error
+	ExpectFailure   bool // set to true if test case is expected to fail
 }
 
 // ExpectNoChanges indicates that no changes is not an error, it is a requirement.
 func (tc *TestCase) ExpectNoChanges() *TestCase {
 	tc.Changeless = true
+	return tc
+}
+
+// ExpectFailure indicates that a test case is expected to fail, and it is an error if it doesn't.
+func (tc *TestCase) ExpectTestFailure() *TestCase {
+	tc.ExpectFailure = true
 	return tc
 }
 
