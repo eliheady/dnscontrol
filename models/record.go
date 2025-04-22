@@ -84,6 +84,7 @@ import (
 // This is the subdomain path, if any, imported from the configuration. If
 // present at the time of canonicalization it is inserted between the
 // Name and origin when constructing a canonical (FQDN) target.
+// (the SubDomain is not used in processing the label itself. That was done in helpers.js)
 //
 // Idioms:
 //
@@ -297,7 +298,7 @@ func (rc *RecordConfig) SetLabel(short, origin string) {
 	}
 	if strings.HasSuffix(short, ".") {
 		if short != "**current-domain**" {
-			panic(fmt.Errorf("short (%s) is not supposed to end with a dot", origin))
+			panic(fmt.Errorf("short (%s) is not supposed to end with a dot", short))
 		}
 	}
 
