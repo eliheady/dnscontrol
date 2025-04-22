@@ -1917,10 +1917,6 @@ func makeTests() []*TestGroup {
 			tc("Delete metadata from record", a("@", "1.2.3.4")),
 		),
 
-		testgroup("INWX expected failure tests",
-			only("INWX"),
-		),
-
 		// This MUST be the last test.
 		testgroup("final",
 			tc("final", txt("final", `TestDNSProviders was successful!`)),
