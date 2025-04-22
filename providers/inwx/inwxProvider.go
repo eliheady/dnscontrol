@@ -569,11 +569,11 @@ func (api *inwxAPI) fetchNameserverDomains() error {
 			// If this is an IDN domain, Nameservers.List.Domains[].Domain
 			// will contain the Unicode name but subsequent calls use the ACE
 			// encoded name. We will convert it now for use as the cache key
-			if aceName, err := idna.ToASCII(domain.Domain); err == nil {
-				zones[aceName] = domain.RoID
-			} else {
+			aceName, err := idna.ToASCII(domain.Domain)
+			if err != nil {
 				return err
 			}
+			zones[aceName] = domain.RoID
 		}
 		if len(zones) >= info.Count {
 			break
