@@ -20,7 +20,7 @@ func TestDNSProviders(t *testing.T) {
 	}
 
 	// REMOVE ME: quick hack to select known failing tests to run
-	runSkippedTests := true
+	runSkippedTests := false
 
 	t.Run(domain, func(t *testing.T) {
 		runTests(t, provider, domain, cfg, runSkippedTests)

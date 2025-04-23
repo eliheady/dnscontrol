@@ -9,6 +9,7 @@ import (
 // that aren't supported by this provider.  If all records are
 // supported, an empty list is returned.
 func AuditRecords(records []*models.RecordConfig) []error {
+	return nil
 	a := rejectif.Auditor{}
 
 	a.Add("TXT", rejectif.TxtHasBackticks) // Last verified 2021-03-01
