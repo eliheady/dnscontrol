@@ -19,8 +19,10 @@ func TestDNSProviders(t *testing.T) {
 		t.Fatal("NO DOMAIN SET!  Exiting!")
 	}
 
+	auditRecordsTestMode := true
+
 	t.Run(domain, func(t *testing.T) {
-		runTests(t, provider, domain, cfg)
+		runTests(t, provider, domain, cfg, auditRecordsTestMode)
 	})
 }
 
