@@ -104,9 +104,14 @@ func testPermitted(p string, f TestGroup) error {
 // makeChanges runs one set of DNS record tests. Returns true on success.
 func makeChanges(t *testing.T, prv providers.DNSServiceProvider, dc *models.DomainConfig, tst *TestCase, desc string, expectChanges bool, origConfig map[string]string, auditRecordsTestMode string) bool {
 	domainName := dc.Name
+
+	// AuditRecords validation and ignore modes are used to check the continued
+	// need for the rules defined in the provider's AuditRecords function. Over
+	// time, the service provider may add support for a feature that was
+	// previously unsupported and blocked. These modes can be used in spot-
+	// checking or scheduled in a CI job.
 	ignoreAuditRecords := auditRecordsTestMode == "ignore"
 	validateAuditRecords := auditRecordsTestMode == "validate"
-
 	/*
 		// fixme: we may not want to conflate these two modes: individual tests
 		// can be set to expect failure seperate from the provider's
@@ -163,11 +168,12 @@ func makeChanges(t *testing.T, prv providers.DNSServiceProvider, dc *models.Doma
 				// This is a special test run to validate the provider's
 				// AuditRecords filters. In the interest of test efficiency, skip
 				// tests that run in a normal integrationTest job.
-				t.Skip("***SKIPPED(this is an AuditRecords validation test)")
+				//t.Skip("***SKIPPED(this is an AuditRecords validation test)")
+				t.SkipNow() // reduce log noise
 				return
 			}
 
-			if err != nil {
+			if !validateAuditRecords && err != nil {
 				t.Skipf("***SKIPPED(PROVIDER DOES NOT SUPPORT '%s' ::%q)", err, desc)
 				return
 			}
@@ -178,18 +184,18 @@ func makeChanges(t *testing.T, prv providers.DNSServiceProvider, dc *models.Doma
 
 		if err == nil {
 			if tst.ExpectFailure {
-				t.Fatalf("Expected failure but got success: %s", tst.Desc)
+				t.Fatalf("Expected failure but got success: '%s'", tst.Desc)
 			}
 			if validateAuditRecords {
 				// if this test is normally skipped by AuditRecords rules, we
 				// may expect a failure here. We need to continue with the
 				// remainder of the test in case the normal failure mode with
 				// this provider is in the second pass.
-				t.Logf("UNEXPECTED SUCCESS: %s", tst.Desc)
+				t.Logf("UNEXPECTED SUCCESS in test '%s'", tst.Desc)
 				t.Log("AuditRules may need to be updated if the second test pass reports UNEXPECTED SUCCESS")
 			}
 		}
-		if err != nil {
+		if !validateAuditRecords && err != nil {
 			// this is a normal test run, so this should be regarded as an
 			// unexpected failure
 			t.Fatal(fmt.Errorf("runTests: %w", err))
@@ -212,19 +218,18 @@ func makeChanges(t *testing.T, prv providers.DNSServiceProvider, dc *models.Doma
 			}
 			if c.F != nil { // F == nil if there is just a msg, no action.
 				err = c.F()
-				// if validateAuditRecords && err == nil {
-				// 	// if this is an AuditRecords validation test, we have hit
-				// 	// an unexpected success. In this context it is a failure
-				// 	// that indicates the provider may now support the tested
-				// 	// zone correction(s)
-				// 	t.Log("(Audit filter check) Expected failure but got success")
-				// 	t.Logf("AuditRules may need to be updated if the second test pass reports UNEXPECTED SUCCESS: %s", c.Msg)
-				// 	// Fatal/FailNow is not appropriate here because we are
-				// 	// expecting a failure and we need to proceed to the later
-				// 	// correction checking to see if we get zero corrections.
-				// 	continue
-				// }
-				if err != nil {
+				if validateAuditRecords && err == nil {
+					// if this is an AuditRecords validation test, we have hit
+					// an unexpected success. In this context it is a 'failure'
+					// that indicates the provider may now support the tested
+					// zone correction(s)
+					// Fatal/FailNow is not appropriate here because we are
+					// expecting a failure and we need to proceed to the later
+					// correction checking to see if we get zero corrections.
+					//t.Log("(Audit filter check) Expected failure but got success")
+					continue
+				}
+				if !validateAuditRecords && err != nil {
 					t.Fatal(err)
 				}
 			}
@@ -240,17 +245,17 @@ func makeChanges(t *testing.T, prv providers.DNSServiceProvider, dc *models.Doma
 		if err != nil {
 			t.Fatal(err)
 		}
-		if (tst.ExpectFailure || validateAuditRecords) && actualChangeCount == 0 {
+		if actualChangeCount == 0 && (tst.ExpectFailure || validateAuditRecords) {
 			// This is an AuditRecords validation test. We expect at least one
 			// correction to be made because according to the filter, this
 			// operation is not supported. If we get zero, it means the provider
 			// has added support for the tested zone correction(s) and the
 			// AuditRecords rules need to be updated.
-			t.Logf("UNEXPECTED SUCCESS: Expected corrections on second run in test %s but found none.", tst.Desc)
+			t.Logf("UNEXPECTED SUCCESS: Expected corrections on second run in test '%s' but found none.", tst.Desc)
 			t.Log("(Audit filter check) This provider's AuditRecords rules should be reviewed.")
 			t.FailNow()
 		}
-		if actualChangeCount != 0 {
+		if actualChangeCount != 0 && !(tst.ExpectFailure || validateAuditRecords) {
 			t.Logf("Expected 0 corrections on second run, but found %d.", actualChangeCount)
 			for i, c := range corrections {
 				t.Logf("UNEXPECTED #%d: %s", i, c.Msg)

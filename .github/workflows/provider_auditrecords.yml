@@ -1,9 +1,20 @@
 name: "Validate AuditRecords rules"
 
+# This workflow is used to run the integration tests in a special mode
+# to detect whether the provider AuditRecords rules are still valid.
+
+# To test this in the context of this suggested change, the workflow has to be
+# registered in GitHub with a `on: pull_request:` or `on: push:` trigger.
+# under normal circumstances, the workflow should be triggered by wokflow_dispatch or a cron.
 # manual run only
 on:
   workflow_dispatch:
-  pull_request:
+  schedule:
+    - cron: '0 0 * */3 0' # every third month
+  push:
+    branches:
+      - elih-scratch-tests
+      - elih-tests-auditrules
 
 # Environment Variables
 env:
