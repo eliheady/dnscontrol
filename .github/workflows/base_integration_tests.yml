@@ -9,10 +9,10 @@ on:
       # arguments in integrationTest/helpers_test.go for details.
       test-args-cfworkers:
         # sets CF provider metadata 'manage_workers' to true|false
-        default: "true"
+        default: true
         description: "Set false to disable CF worker tests"
         required: false
-        type: string
+        type: boolean
       test-args-cfredirect:
         # if unset, the CF provider metadata will have 'manage_redirects' set to true
         default: ""
@@ -27,26 +27,26 @@ on:
         type: string
       test-args-start:
         # index of the first test to run
-        default: "" # defaults to 0
+        default: -1
         description: "Test number to begin with"
         required: false
-        type: string
+        type: number
       test-args-end:
         # index of the last test to run
-        default: "" # defaults to -1 (length of test list)
+        default: -1
         description: "Test number to stop after"
         required: false
-        type: string
+        type: number
       test-args-verbose:
-        default: "" # if unset, default is false
+        default: false
         description: "Print corrections as you run them"
         required: false
-        type: string
+        type: boolean
       test-args-print-elapsed:
-        default: "" # if unset, default is false
+        default: false
         description: "Print elapsed time for each testgroup"
         required: false
-        type: string
+        type: boolean
 
 
 # Environment Variables
@@ -237,16 +237,16 @@ jobs:
       run: |-
         go install gotest.tools/gotestsum@latest
         testArgs=""
-        if [ "$${{ inputs.test-args-verbose }}" == "true" ] ; then       testArgs="$$testArgs -verbose"; fi
-        if [ "$${{ inputs.test-args-print-elapsed }}" == "true" ] ; then testArgs="$$testArgs -elapsed"; fi
-        if [ "$${{ inputs.test-args-cfworkers }}" == "true" ] ; then     testArgs="$$testArgs -cfworkers"; fi
-        if [ -n "$${{ inputs.test-args-cfredirect }}" ] ; then           testArgs="$$testArgs -cfredirect=${{ inputs.test-args-cfredirect }}"; fi
-        if [ -n "$${{ inputs.test-args-auditrecords }}" ] ; then         testArgs="$$testArgs -auditrecords=${{ inputs.test-args-auditrecords }}"; fi
-        if [ -n "$${{ inputs.test-args-start }}" ] ; then                testArgs="$$testArgs -startIdx=${{ inputs.test-args-start }}"; fi
-        if [ -n "$${{ inputs.test-args-end }}" ] ; then                  testArgs="$$testArgs -endIdx=${{ inputs.test-args-end }}"; fi
+        if [ "$${{ inputs.test-args-verbose }}" != "" ] ; then       testArgs="$testArgs -verbose=${{ inputs.test-args-verbose}}"; fi
+        if [ "$${{ inputs.test-args-print-elapsed }}" != "" ] ; then testArgs="$testArgs -elapsed=${{ inputs.test-args-print-elapsed}}"; fi
+        if [ "$${{ inputs.test-args-cfworkers }}" != "" ] ; then     testArgs="$testArgs -cfworkers=${{ inputs.test-args-cfworkers}}"; fi
+        if [ "$${{ inputs.test-args-cfredirect }}" != "" ] ; then    testArgs="$testArgs -cfredirect=${{ inputs.test-args-cfredirect }}"; fi
+        if [ "$${{ inputs.test-args-auditrecords }}" != "" ] ; then  testArgs="$testArgs -auditrecords=${{ inputs.test-args-auditrecords }}"; fi
+        if [ "$${{ inputs.test-args-start }}" != "" ] ; then         testArgs="$testArgs -startIdx=${{ inputs.test-args-start }}"; fi
+        if [ "$${{ inputs.test-args-end }}" != "" ] ; then           testArgs="$testArgs -endIdx=${{ inputs.test-args-end }}"; fi
 
         if [ -n "$${{ matrix.provider }}_DOMAIN" ] ; then
-          gotestsum --junitfile ${TEST_RESULTS}/gotestsum-report.xml -- -timeout 30m -v -verbose -profile ${{ matrix.provider }} $$testArgs
+          echo -- gotestsum --junitfile ${TEST_RESULTS}/gotestsum-report.xml -- -timeout 30m -v -verbose -profile ${{ matrix.provider }} $testArgs
         else
           echo "Skip test for ${{ matrix.provider }} provider"
         fi

@@ -21,5 +21,5 @@ jobs:
   call-reusable:
     uses: ./.github/workflows/base_integration_tests.yml
     with:
-      test-args-cfworkers: 'false'
+      test-args-cfworkers: false
       test-args-auditrecords: 'validate'
