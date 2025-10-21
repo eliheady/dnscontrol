@@ -89,6 +89,7 @@ jobs:
       HEDNS_DOMAIN: ${{ vars.HEDNS_DOMAIN }}
       HEXONET_DOMAIN: ${{ vars.HEXONET_DOMAIN }}
       HUAWEICLOUD_DOMAIN: ${{ vars.HUAWEICLOUD_DOMAIN }}
+      INWX_DOMAIN: ${{ vars.INWX_DOMAIN }}
       JOKER_DOMAIN: ${{ vars.JOKER_DOMAIN }}
       MYTHICBEASTS_DOMAIN: ${{ vars.MYTHICBEASTS_DOMAIN }}
       NAMEDOTCOM_DOMAIN: ${{ vars.NAMEDOTCOM_DOMAIN }}
@@ -161,6 +162,9 @@ jobs:
       HUAWEICLOUD_REGION: ${{ secrets.HUAWEICLOUD_REGION }}
       HUAWEICLOUD_KEY_ID: ${{ secrets.HUAWEICLOUD_KEY_ID }}
       HUAWEICLOUD_KEY: ${{ secrets.HUAWEICLOUD_KEY }}
+      #
+      INWX_PASSWORD: ${{ secrets.INWX_PASSWORD }}
+      INWX_USERNAME: ${{ secrets.INWX_USERNAME }}
       #
       JOKER_USERNAME: ${{ secrets.JOKER_USERNAME }}
       JOKER_PASSWORD: ${{ secrets.JOKER_PASSWORD }}

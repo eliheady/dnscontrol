@@ -202,7 +202,7 @@
     "domain": "$INWX_DOMAIN",
     "password": "$INWX_PASSWORD",
     "sandbox": "1",
-    "username": "$INWX_USER"
+    "username": "$INWX_USERNAME"
   },
   "JOKER": {
     "TYPE": "JOKER",
