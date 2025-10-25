@@ -270,9 +270,13 @@ func (api *inwxAPI) AutoDnssecToggle(dc *models.DomainConfig, corrections []*mod
 // GetZoneRecordsCorrections returns a list of corrections that will turn existing records into dc.Records.
 func (api *inwxAPI) GetZoneRecordsCorrections(dc *models.DomainConfig, foundRecords models.Records) ([]*models.Correction, int, error) {
 
+	// INWX support for Null MX requires special handling.  MX preference changes
+	// of >0 to 0 are silently dropped, so if the change includes a null MX record
+	// we have to delete then create.  Corrections are compiled separately for
+	// deletes, changes and creates and then assembled in that order.
 	corrections := []*models.Correction{}
-	// deferredCorr holds null MX changes that should happen after regular corrections
-	deferredCorr := []*models.Correction{}
+	creates := []*models.Correction{}
+	deferred := []*models.Correction{}
 
 	corrections, err := api.AutoDnssecToggle(dc, corrections)
 	if err != nil {
@@ -299,7 +303,7 @@ func (api *inwxAPI) GetZoneRecordsCorrections(dc *models.DomainConfig, foundReco
 						return api.deleteRecord(oldRec.Original.(goinwx.NameserverRecord).ID)
 					},
 				})
-				deferredCorr = append(deferredCorr, &models.Correction{
+				deferred = append(deferred, &models.Correction{
 					Msg: color.GreenString("+ CREATE %s %s %s ttl=%d", newRec.GetLabelFQDN(), newRec.Type, newRec.ToComparableNoTTL(), newRec.TTL),
 					F: func() error {
 						return api.createRecord(dc.Name, newRec)
@@ -316,7 +320,7 @@ func (api *inwxAPI) GetZoneRecordsCorrections(dc *models.DomainConfig, foundReco
 
 			}
 		case diff2.CREATE:
-			corrections = append(corrections, &models.Correction{
+			creates = append(creates, &models.Correction{
 				Msg: changeMsgs,
 				F: func() error {
 					return api.createRecord(dc.Name, change.New[0])
@@ -332,7 +336,8 @@ func (api *inwxAPI) GetZoneRecordsCorrections(dc *models.DomainConfig, foundReco
 			panic(fmt.Sprintf("unhandled change.Type %s", change.Type))
 		}
 	}
-	corrections = append(corrections, deferredCorr...)
+	corrections = append(corrections, creates...)
+	corrections = append(corrections, deferred...)
 	return corrections, actualChangeCount, nil
 }
 
